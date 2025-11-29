@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coloring Book</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden; /* Prevent horizontal scrolling */
+        background-color: #f0f4f8; /* Match app background */
+      }
+      
+      #root {
+        height: 100%;
+      }
+
+      /* --- Base Layout (Mobile First <= 480px) --- */
+      .app-layout {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .app-header {
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      /* Main content wrapper */
+      .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        gap: 20px;
+      }
+
+      .drawing-section {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .controls-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+      }
+
+      /* Ensure Drawing Area scales but preserves aspect ratio */
+      .drawing-container-responsive {
+        width: 100%;
+        max-width: 100%; 
+        height: auto;
+        aspect-ratio: 1 / 1; /* Keep square aspect ratio for the drawing */
+      }
+
+      /* --- Intermediate (481px to 1439px) --- */
+      @media (min-width: 481px) {
+        .content-wrapper {
+          padding: 30px;
+          max-width: 800px;
+          margin: 0 auto; /* Center content */
+        }
+
+        .controls-sidebar {
+            flex-direction: row; /* Place palette and nav side-by-side if space permits, or wrap */
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .palette-responsive {
+            flex: 1 1 300px; /* Allow growing */
+        }
+        
+        .nav-responsive {
+            flex: 1 1 200px;
+        }
+      }
+
+      /* --- Desktop (>= 1440px) --- */
+      @media (min-width: 1440px) {
+        .app-layout {
+            padding: 40px;
+            height: 100vh;
+            overflow: hidden; /* Use internal scrolling for sections if needed */
+        }
+
+        .content-wrapper {
+            max-width: 1800px;
+            margin: 0 auto;
+            flex-direction: row; /* Side-by-side layout */
+            align-items: flex-start; /* Align top */
+            gap: 60px; /* Generous whitespace */
+            height: calc(100vh - 120px); /* Adjust for header/padding */
+        }
+
+        .drawing-section {
+            flex: 2; /* Takes up 2/3 space */
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drawing-container-responsive {
+            max-height: 100%;
+            width: auto;
+            max-width: 100%;
+        }
+
+        .controls-sidebar {
+            flex: 1; /* Takes up 1/3 space */
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+            gap: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-responsive {
+            margin-top: auto; /* Push nav to bottom of sidebar logic */
+        }
+      }
+    </style>
+    <script type="importmap">
+    {
+      "imports": {
+        "react/": "https://aistudiocdn.com/react@^19.2.0/",
+        "react": "https://aistudiocdn.com/react@^19.2.0",
+        "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
+        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+      }
+    }
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="module" src="index.tsx"></script>
+</body>
+</html>
