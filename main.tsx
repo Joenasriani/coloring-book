@@ -2,11 +2,14 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { colors, levels, Shape } from './levels';
 
+const MUSIC_SRC = '/music/Color%20Parade.mp3';
+
 const ui = {
   app: { fontFamily: 'Nunito, Arial, sans-serif', textAlign: 'center' as const, color: '#2f2f2f' },
-  header: { background: 'linear-gradient(135deg, #7b1fa2 0%, #ec407a 100%)', color: 'white', padding: 'clamp(12px, 3vw, 22px)', boxShadow: '0 4px 12px rgba(0,0,0,0.22)', fontWeight: 800, borderBottomLeftRadius: 'clamp(14px, 4vw, 28px)', borderBottomRightRadius: 'clamp(14px, 4vw, 28px)', display: 'flex', justifyContent: 'center' },
-  title: { margin: 0, fontSize: 'clamp(1.12rem, 5vw, 2.35rem)', lineHeight: 1.08 },
-  desc: { margin: '6px 0 0', fontSize: 'clamp(0.78rem, 2.5vw, 0.98rem)', fontWeight: 700, opacity: 0.92 },
+  header: { background: 'linear-gradient(135deg, #7b1fa2 0%, #ec407a 100%)', color: 'white', padding: 'clamp(12px, 3vw, 22px)', boxShadow: '0 4px 12px rgba(0,0,0,0.22)', fontWeight: 800, borderBottomLeftRadius: 'clamp(14px, 4vw, 28px)', borderBottomRightRadius: 'clamp(14px, 4vw, 28px)', display: 'flex', justifyContent: 'center', position: 'relative' as const },
+  musicButton: { position: 'fixed' as const, top: 'calc(env(safe-area-inset-top, 0px) + 12px)', right: 'calc(env(safe-area-inset-right, 0px) + 12px)', zIndex: 20, width: 46, height: 46, borderRadius: '50%', border: '2px solid rgba(255,255,255,0.72)', background: 'rgba(255,255,255,0.92)', color: '#7b1fa2', boxShadow: '0 6px 18px rgba(0,0,0,0.22)', cursor: 'pointer', fontSize: 20, display: 'grid', placeItems: 'center', backdropFilter: 'blur(8px)' },
+  title: { margin: 0, fontSize: 'clamp(1.12rem, 5vw, 2.35rem)', lineHeight: 1.08, paddingInline: 54 },
+  desc: { margin: '6px 0 0', fontSize: 'clamp(0.78rem, 2.5vw, 0.98rem)', fontWeight: 700, opacity: 0.92, paddingInline: 54 },
   card: { display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(8px, 2.5vw, 16px)', backgroundColor: '#fff', borderRadius: 20, boxShadow: '0 6px 18px rgba(0,0,0,0.12)', width: '100%', height: '100%' },
   svg: { width: '100%', height: '100%', display: 'block', touchAction: 'manipulation' as const, backgroundColor: '#fbfdff', borderRadius: 14 },
   palette: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(44px, 1fr))', gap: 'clamp(8px, 2vw, 12px)', padding: 'clamp(10px, 3vw, 18px)', backgroundColor: '#e8f5e9', border: '1.5px solid #c8e6c9', borderRadius: 22, boxShadow: '0 4px 8px rgba(0,0,0,0.1)' },
@@ -37,7 +40,10 @@ function App() {
   const [index, setIndex] = useState(0);
   const [saved, setSaved] = useState<Record<number, Record<string, string>>>({});
   const [fills, setFills] = useState<Record<string, string>>({});
+  const [isMusicOn, setIsMusicOn] = useState(false);
+  const [musicNeedsTap, setMusicNeedsTap] = useState(false);
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const level = levels[index];
 
   useEffect(() => {
@@ -45,6 +51,43 @@ function App() {
     setFills(initial);
     setSaved(prev => ({ ...prev, [index]: initial }));
   }, [index]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    audio.volume = 0.45;
+    audio.loop = true;
+
+    audio.play()
+      .then(() => {
+        setIsMusicOn(true);
+        setMusicNeedsTap(false);
+      })
+      .catch(() => {
+        setIsMusicOn(false);
+        setMusicNeedsTap(true);
+      });
+  }, []);
+
+  const toggleMusic = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (audio.paused) {
+      audio.play()
+        .then(() => {
+          setIsMusicOn(true);
+          setMusicNeedsTap(false);
+        })
+        .catch(() => setMusicNeedsTap(true));
+      return;
+    }
+
+    audio.pause();
+    setIsMusicOn(false);
+    setMusicNeedsTap(false);
+  };
 
   const setFill = useCallback((id: string, color: string) => {
     setFills(prev => {
@@ -83,9 +126,16 @@ function App() {
 
   const titleId = level.title.replace(/\s/g, '-') + '-title';
   const descId = level.title.replace(/\s/g, '-') + '-desc';
+  const musicLabel = isMusicOn ? 'Turn music off' : 'Turn music on';
 
   return <div className="app-layout" style={ui.app}>
-    <header className="app-header" style={ui.header}><div><h1 style={ui.title}>🎨 {level.title}</h1><p style={ui.desc}>{index + 1} / {levels.length} · {level.desc}</p></div></header>
+    <audio ref={audioRef} src={MUSIC_SRC} preload="auto" playsInline />
+    <header className="app-header" style={ui.header}>
+      <button type="button" onClick={toggleMusic} aria-label={musicLabel} title={musicNeedsTap ? 'Tap to start music' : musicLabel} style={{...ui.musicButton, opacity: musicNeedsTap ? 1 : 0.94}}>
+        {isMusicOn ? '🔊' : '🎵'}
+      </button>
+      <div><h1 style={ui.title}>🎨 {level.title}</h1><p style={ui.desc}>{index + 1} / {levels.length} · {level.desc}</p></div>
+    </header>
     <div className="content-wrapper"><main className="drawing-section"><div className="drawing-container-responsive" style={ui.card}><svg ref={svgRef} viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" aria-labelledby={`${titleId} ${descId}`} style={ui.svg}><title id={titleId}>{level.title}</title><desc id={descId}>{level.desc}</desc>{level.shapes.map(x => <ShapeNode key={x.id} shape={x} color={fills[x.id] || x.initial || '#eeeeee'} selected={selected} setFill={setFill} />)}</svg></div></main>
       <aside className="controls-sidebar"><Palette selected={selected} setSelected={setSelected}/><footer className="nav-responsive" style={ui.nav}><button onClick={() => setIndex(Math.max(0, index - 1))} disabled={index === 0} style={{...ui.btn, backgroundColor:'#ef5350', opacity:index===0?.55:1}}>Previous</button><button onClick={() => setIndex(Math.min(levels.length - 1, index + 1))} disabled={index === levels.length - 1} style={{...ui.btn, backgroundColor:'#42a5f5', opacity:index===levels.length-1?.55:1}}>Next</button><button onClick={reset} style={{...ui.btn, backgroundColor:'#7e57c2'}}>Reset Level</button><button onClick={saveImage} style={{...ui.btn, backgroundColor:'#66bb6a'}}>💾 Save Image</button></footer></aside></div>
   </div>;
