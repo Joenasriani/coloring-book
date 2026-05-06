@@ -7,117 +7,25 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
       * { box-sizing: border-box; }
-
-      html,
-      body {
-        min-height: 100%;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        background-color: #f0f4f8;
-      }
-
+      html, body { min-height: 100%; margin: 0; padding: 0; overflow-x: hidden; background-color: #f0f4f8; }
       body { min-width: 320px; }
       #root { min-height: 100%; }
-
-      button,
-      [role="button"] { -webkit-tap-highlight-color: transparent; }
-
-      .app-layout {
-        display: flex;
-        flex-direction: column;
-        min-height: 100svh;
-        width: 100%;
-      }
-
-      .app-header {
-        width: 100%;
-        position: sticky;
-        top: 0;
-        z-index: 5;
-      }
-
-      .content-wrapper {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        align-items: start;
-        width: 100%;
-        max-width: 1920px;
-        margin: 0 auto;
-        padding: clamp(8px, 3vw, 28px);
-        gap: clamp(12px, 3vw, 28px);
-      }
-
-      .drawing-section {
-        width: 100%;
-        min-width: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .controls-sidebar {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        gap: clamp(12px, 3vw, 20px);
-        width: 100%;
-        min-width: 0;
-      }
-
-      .drawing-container-responsive {
-        width: min(100%, 92svh, 760px);
-        max-width: 100%;
-        height: auto;
-        aspect-ratio: 1 / 1;
-      }
-
-      .palette-responsive,
-      .nav-responsive { min-width: 0; }
-
-      @media (max-width: 480px) {
-        .app-header { position: static; }
-        .content-wrapper { padding: 8px; gap: 10px; }
-        .drawing-container-responsive { width: min(100%, 78svh); }
-      }
-
-      @media (min-width: 700px) {
-        .controls-sidebar {
-          grid-template-columns: minmax(0, 1.3fr) minmax(220px, 0.7fr);
-          align-items: stretch;
-        }
-      }
-
-      @media (min-width: 1100px) {
-        .content-wrapper {
-          grid-template-columns: minmax(460px, 1fr) minmax(320px, 420px);
-          align-items: center;
-        }
-
-        .controls-sidebar {
-          grid-template-columns: minmax(0, 1fr);
-          position: sticky;
-          top: 110px;
-        }
-
-        .drawing-container-responsive {
-          width: min(100%, calc(100svh - 150px), 860px);
-        }
-      }
-
-      @media (min-width: 1500px) {
-        .content-wrapper {
-          grid-template-columns: minmax(620px, 1fr) 460px;
-          gap: 48px;
-        }
-
-        .drawing-container-responsive {
-          width: min(100%, calc(100svh - 170px), 960px);
-        }
-      }
+      button, [role="button"] { -webkit-tap-highlight-color: transparent; }
+      .app-layout { display: flex; flex-direction: column; min-height: 100svh; width: 100%; }
+      .app-header { width: 100%; position: sticky; top: 0; z-index: 5; }
+      .content-wrapper { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; width: 100%; max-width: 1920px; margin: 0 auto; padding: clamp(8px, 3vw, 28px); gap: clamp(12px, 3vw, 28px); }
+      .drawing-section { width: 100%; min-width: 0; display: flex; justify-content: center; align-items: center; }
+      .controls-sidebar { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(12px, 3vw, 20px); width: 100%; min-width: 0; }
+      .drawing-container-responsive { width: min(100%, 92svh, 760px); max-width: 100%; height: auto; aspect-ratio: 1 / 1; }
+      .palette-responsive, .nav-responsive { min-width: 0; }
+      @media (max-width: 480px) { .app-header { position: static; } .content-wrapper { padding: 8px; gap: 10px; } .drawing-container-responsive { width: min(100%, 78svh); } }
+      @media (min-width: 700px) { .controls-sidebar { grid-template-columns: minmax(0, 1.3fr) minmax(220px, 0.7fr); align-items: stretch; } }
+      @media (min-width: 1100px) { .content-wrapper { grid-template-columns: minmax(460px, 1fr) minmax(320px, 420px); align-items: center; } .controls-sidebar { grid-template-columns: minmax(0, 1fr); position: sticky; top: 110px; } .drawing-container-responsive { width: min(100%, calc(100svh - 150px), 860px); } }
+      @media (min-width: 1500px) { .content-wrapper { grid-template-columns: minmax(620px, 1fr) 460px; gap: 48px; } .drawing-container-responsive { width: min(100%, calc(100svh - 170px), 960px); } }
     </style>
 </head>
 <body>
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="/main.tsx"></script>
 </body>
 </html>
