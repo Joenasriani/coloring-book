@@ -1,11 +1,7 @@
 import React, { useState, CSSProperties, useCallback, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 
-// --- Styling Objects (Visuals Only) ---
-// Layout responsibility has been moved to index.html CSS classes
-
 const appStyles: CSSProperties = {
-  // Layout handled by .app-layout class
   fontFamily: 'Nunito, Arial, sans-serif',
   textAlign: 'center',
   color: '#333',
@@ -16,7 +12,6 @@ const headerStyles: CSSProperties = {
   color: 'white',
   padding: '20px 15px',
   boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
-  fontSize: '2em',
   fontWeight: 'bold',
   borderBottomLeftRadius: '20px',
   borderBottomRightRadius: '20px',
@@ -25,7 +20,12 @@ const headerStyles: CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   gap: '10px',
-  position: 'relative', // Context for absolute positioning if needed
+};
+
+const headerTitleStyles: CSSProperties = {
+  margin: 0,
+  fontSize: 'clamp(1.4rem, 5vw, 2.6rem)',
+  lineHeight: 1.1,
 };
 
 const paletteContainerStyles: CSSProperties = {
@@ -41,7 +41,7 @@ const paletteContainerStyles: CSSProperties = {
 };
 
 const colorButtonBaseStyles: CSSProperties = {
-  width: '90px', // Large touch target
+  width: '90px',
   height: '90px',
   borderRadius: '50%',
   cursor: 'pointer',
@@ -73,11 +73,11 @@ const svgBaseStyle: CSSProperties = {
   borderRadius: '10px',
 };
 
-const svgPathBaseStyle: CSSProperties = {
+const svgShapeBaseStyle: CSSProperties = {
   stroke: '#333',
-  strokeWidth: '2.5',
+  strokeWidth: 2.5,
   cursor: 'pointer',
-  transition: 'fill 0.1s ease-out',
+  transition: 'fill 0.1s ease-out, stroke 0.1s ease-out',
   outline: 'none',
 };
 
@@ -106,7 +106,6 @@ const levelButtonStyles: CSSProperties = {
   width: '100%',
 };
 
-// --- ColorPalette Component ---
 interface ColorPaletteProps {
   colors: string[];
   selectedColor: string;
@@ -118,34 +117,45 @@ const ColorPalette: React.FC<ColorPaletteProps> = ({ colors, selectedColor, onSe
     <div
       className="palette-responsive"
       aria-label="Color palette"
+      role="radiogroup"
       style={paletteContainerStyles}
     >
-      {colors.map((color) => (
-        <button
-          key={color}
-          aria-label={`Select ${color} color`}
-          role="radio"
-          aria-checked={selectedColor === color}
-          onClick={() => onSelectColor(color)}
-          style={{
-            ...colorButtonBaseStyles,
-            backgroundColor: color,
-            border: `3px solid ${selectedColor === color ? '#6a1b9a' : 'transparent'}`,
-            boxShadow: selectedColor === color ? '0 0 0 5px #f48fb1' : '0 2px 5px rgba(0,0,0,0.2)',
-            transform: selectedColor === color ? 'scale(1.1)' : 'scale(1)',
-          }}
-        />
-      ))}
+      {colors.map((color) => {
+        const isSelected = selectedColor === color;
+        const isWhite = color.toUpperCase() === '#FFFFFF';
+
+        return (
+          <button
+            key={color}
+            aria-label={`Select ${color} color`}
+            role="radio"
+            aria-checked={isSelected}
+            onClick={() => onSelectColor(color)}
+            style={{
+              ...colorButtonBaseStyles,
+              backgroundColor: color,
+              backgroundImage: isWhite
+                ? 'linear-gradient(45deg, #ddd 25%, transparent 25%), linear-gradient(-45deg, #ddd 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ddd 75%), linear-gradient(-45deg, transparent 75%, #ddd 75%)'
+                : undefined,
+              backgroundSize: isWhite ? '18px 18px' : undefined,
+              backgroundPosition: isWhite ? '0 0, 0 9px, 9px -9px, -9px 0px' : undefined,
+              border: `3px solid ${isSelected ? '#6a1b9a' : isWhite ? '#999' : 'transparent'}`,
+              boxShadow: isSelected ? '0 0 0 5px #f48fb1' : '0 2px 5px rgba(0,0,0,0.2)',
+              transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+            }}
+          />
+        );
+      })}
     </div>
   );
 };
 
-// --- DrawingArea Component ---
 interface SvgShape {
   id: string;
   type: 'path' | 'rect' | 'circle';
   ariaLabel: string;
   initialColor: string;
+  colorMode?: 'fill' | 'stroke';
   props: { [key: string]: string | number };
 }
 
@@ -160,14 +170,14 @@ const houseShapes: SvgShape[] = [
 
 const sunShapes: SvgShape[] = [
   { id: 'sunCenter', type: 'circle', ariaLabel: 'Sun center', initialColor: '#ccc', props: { cx: '350', cy: '70', r: '30' } },
-  { id: 'sunRay1', type: 'path', ariaLabel: 'Sun ray 1', initialColor: '#ccc', props: { d: 'M350 40 L350 20' } },
-  { id: 'sunRay2', type: 'path', ariaLabel: 'Sun ray 2', initialColor: '#ccc', props: { d: 'M370 50 L385 40' } },
-  { id: 'sunRay3', type: 'path', ariaLabel: 'Sun ray 3', initialColor: '#ccc', props: { d: 'M380 70 L390 70' } },
-  { id: 'sunRay4', type: 'path', ariaLabel: 'Sun ray 4', initialColor: '#ccc', props: { d: 'M370 90 L385 100' } },
-  { id: 'sunRay5', type: 'path', ariaLabel: 'Sun ray 5', initialColor: '#ccc', props: { d: 'M350 100 L350 120' } },
-  { id: 'sunRay6', type: 'path', ariaLabel: 'Sun ray 6', initialColor: '#ccc', props: { d: 'M330 90 L315 100' } },
-  { id: 'sunRay7', type: 'path', ariaLabel: 'Sun ray 7', initialColor: '#ccc', props: { d: 'M320 70 L310 70' } },
-  { id: 'sunRay8', type: 'path', ariaLabel: 'Sun ray 8', initialColor: '#ccc', props: { d: 'M330 50 L315 40' } },
+  { id: 'sunRay1', type: 'path', ariaLabel: 'Sun ray 1', initialColor: '#ccc', colorMode: 'stroke', props: { d: 'M350 40 L350 20' } },
+  { id: 'sunRay2', type: 'path', ariaLabel: 'Sun ray 2', initialColor: '#ccc', colorMode: 'stroke', props: { d: 'M370 50 L385 40' } },
+  { id: 'sunRay3', type: 'path', ariaLabel: 'Sun ray 3', initialColor: '#ccc', colorMode: 'stroke', props: { d: 'M380 70 L390 70' } },
+  { id: 'sunRay4', type: 'path', ariaLabel: 'Sun ray 4', initialColor: '#ccc', colorMode: 'stroke', props: { d: 'M370 90 L385 100' } },
+  { id: 'sunRay5', type: 'path', ariaLabel: 'Sun ray 5', initialColor: '#ccc', colorMode: 'stroke', props: { d: 'M350 100 L350 120' } },
+  { id: 'sunRay6', type: 'path', ariaLabel: 'Sun ray 6', initialColor: '#ccc', colorMode: 'stroke', props: { d: 'M330 90 L315 100' } },
+  { id: 'sunRay7', type: 'path', ariaLabel: 'Sun ray 7', initialColor: '#ccc', colorMode: 'stroke', props: { d: 'M320 70 L310 70' } },
+  { id: 'sunRay8', type: 'path', ariaLabel: 'Sun ray 8', initialColor: '#ccc', colorMode: 'stroke', props: { d: 'M330 50 L315 40' } },
 ];
 
 const cloudShapes: SvgShape[] = [
@@ -213,12 +223,19 @@ interface DrawingAreaProps {
   levelTitle: string;
   fillColors: Record<string, string>;
   onColorPartFill: (partId: string, color: string) => void;
-  svgRef: React.RefObject<SVGSVGElement>;
+  svgRef: React.RefObject<SVGSVGElement | null>;
 }
 
 const DrawingArea: React.FC<DrawingAreaProps> = ({ selectedColor, shapes, levelTitle, fillColors, onColorPartFill, svgRef }) => {
   const handlePartClick = (partName: string) => {
     onColorPartFill(partName, selectedColor);
+  };
+
+  const handlePartKeyDown = (event: React.KeyboardEvent<SVGElement>, partName: string) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handlePartClick(partName);
+    }
   };
 
   const svgTitleId = `${levelTitle.replace(/\s/g, '-')}-title`;
@@ -242,11 +259,17 @@ const DrawingArea: React.FC<DrawingAreaProps> = ({ selectedColor, shapes, levelT
         <desc id={svgDescId}>An outlined drawing of {levelTitle} for coloring.</desc>
 
         {shapes.map((shape) => {
+          const color = fillColors[shape.id] || shape.initialColor;
+          const isStrokeColored = shape.colorMode === 'stroke';
           const commonProps = {
             key: shape.id,
-            fill: fillColors[shape.id],
-            style: svgPathBaseStyle,
+            fill: isStrokeColored ? 'none' : color,
+            stroke: isStrokeColored ? color : '#333',
+            strokeWidth: isStrokeColored ? 8 : 2.5,
+            strokeLinecap: isStrokeColored ? 'round' as const : undefined,
+            style: svgShapeBaseStyle,
             onClick: () => handlePartClick(shape.id),
+            onKeyDown: (event: React.KeyboardEvent<SVGElement>) => handlePartKeyDown(event, shape.id),
             'aria-label': shape.ariaLabel,
             tabIndex: 0,
             role: 'button',
@@ -263,7 +286,6 @@ const DrawingArea: React.FC<DrawingAreaProps> = ({ selectedColor, shapes, levelT
   );
 };
 
-// --- Main ColoringBook App Component ---
 const ColoringBook: React.FC = () => {
   const colors = [
     '#FF0000', '#FFA500', '#FFFF00', '#008000', '#0000FF', '#800080', '#FFC0CB', '#A52A2A', '#FFFFFF'
@@ -272,8 +294,8 @@ const ColoringBook: React.FC = () => {
   const [currentLevelIndex, setCurrentLevelIndex] = useState<number>(0);
   const [levelColoringState, setLevelColoringState] = useState<Record<number, Record<string, string>>>({});
   const [currentLevelColors, setCurrentLevelColors] = useState<Record<string, string>>({});
-  
-  const svgRef = useRef<SVGSVGElement>(null);
+
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
   const currentLevel = allLevels[currentLevelIndex];
   const isFirstLevel = currentLevelIndex === 0;
@@ -298,7 +320,7 @@ const ColoringBook: React.FC = () => {
         [currentLevelIndex]: newColorsForCurrentLevel,
       }));
     }
-  }, [currentLevelIndex, levelColoringState, allLevels]);
+  }, [currentLevelIndex, levelColoringState]);
 
   const handleColorPartFill = useCallback((partId: string, newColor: string) => {
     setCurrentLevelColors(prevCurrentColors => {
@@ -321,54 +343,49 @@ const ColoringBook: React.FC = () => {
   const goToPreviousLevel = () => {
     if (!isFirstLevel) setCurrentLevelIndex((prevIndex) => prevIndex - 1);
   };
-  
+
   const handleSaveImage = () => {
     if (!svgRef.current) return;
+
     const svgData = new XMLSerializer().serializeToString(svgRef.current);
-    const canvas = document.createElement("canvas");
-    const svgSize = svgRef.current.getBoundingClientRect();
-    
-    // Scale for better quality (2x)
-    const scale = 2;
-    canvas.width = svgSize.width * scale;
-    canvas.height = svgSize.height * scale;
-    
-    const ctx = canvas.getContext("2d");
-    if(!ctx) return;
-    
+    const canvas = document.createElement('canvas');
+    const exportSize = 1200;
+
+    canvas.width = exportSize;
+    canvas.height = exportSize;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
     const img = new Image();
-    // Encode SVG string to base64 safely
-    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
-    
+    const encodedSvg = window.btoa(unescape(encodeURIComponent(svgData)));
+    img.src = `data:image/svg+xml;base64,${encodedSvg}`;
+
     img.onload = () => {
-        // Draw white background
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        
-        const a = document.createElement("a");
-        const fileName = `coloring-level-${currentLevelIndex + 1}.jpg`;
-        a.download = fileName;
-        // Use JPEG as requested
-        a.href = canvas.toDataURL("image/jpeg", 0.9);
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, exportSize, exportSize);
+
+      const a = document.createElement('a');
+      a.download = `coloring-level-${currentLevelIndex + 1}.jpg`;
+      a.href = canvas.toDataURL('image/jpeg', 0.92);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
     };
   };
 
   return (
     <div className="app-layout" style={appStyles}>
       <header className="app-header" style={headerStyles}>
-        <div style={{display:'flex', alignItems: 'center', gap: '10px'}}>
-            <span>🎨</span>
-            <h1>{currentLevel.levelTitle}</h1>
-            <span>🖍️</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span aria-hidden="true">🎨</span>
+          <h1 style={headerTitleStyles}>{currentLevel.levelTitle}</h1>
+          <span aria-hidden="true">🖍️</span>
         </div>
       </header>
 
       <div className="content-wrapper">
-        {/* Drawing Section */}
         <div className="drawing-section">
           <DrawingArea
             selectedColor={selectedColor}
@@ -380,10 +397,9 @@ const ColoringBook: React.FC = () => {
           />
         </div>
 
-        {/* Sidebar Controls (Palette + Nav) */}
-        <aside className="controls-sidebar">
+        <aside className="controls-sidebar" aria-label="Coloring controls">
           <ColorPalette colors={colors} selectedColor={selectedColor} onSelectColor={setSelectedColor} />
-          
+
           <footer className="nav-responsive" style={levelNavigationContainerStyles}>
             <button
               onClick={goToNextLevel}
@@ -413,10 +429,10 @@ const ColoringBook: React.FC = () => {
             </button>
             <button
               onClick={handleSaveImage}
-              aria-label="Save coloring as Image"
+              aria-label="Save coloring as image"
               style={{
                 ...levelButtonStyles,
-                backgroundColor: '#66bb6a', // distinct green color
+                backgroundColor: '#66bb6a',
               }}
             >
               💾 Save Image
