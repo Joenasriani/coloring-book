@@ -1,20 +1,73 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Coloring Book
 
-# Run and deploy your AI Studio app
+A small browser-based coloring book built with React, TypeScript, and Vite.
 
-This contains everything you need to run your app locally.
+The app lets users:
 
-View your app in AI Studio: https://ai.studio/apps/drive/1rqlPfdBQMWt73cGRT9Y_xxvkREl0x2wl
+- Pick a color from a large touch-friendly palette
+- Color SVG drawing regions by clicking or tapping
+- Move through five progressively richer coloring levels
+- Save the current drawing as a JPG image
 
-## Run Locally
+## Tech stack
 
-**Prerequisites:**  Node.js
+- React
+- TypeScript
+- Vite
 
+## Local development
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+Prerequisites:
+
+- Node.js 22.x recommended
+- npm
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the dev server:
+
+```bash
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview the production build locally:
+
+```bash
+npm run preview
+```
+
+Run TypeScript checks:
+
+```bash
+npm run typecheck
+```
+
+## Environment variables
+
+No environment variables are required for the current app.
+
+Do not add a Gemini or other AI API key unless a real server-side AI feature is introduced later. Frontend-only Vite environment variables can be exposed to browser bundles when referenced.
+
+## Vercel deployment
+
+Use these settings:
+
+- Framework preset: Vite
+- Build command: `npm run build`
+- Output directory: `dist`
+- Install command: `npm install`
+- Node.js version: 22.x recommended
+
+## Production notes
+
+This is a static frontend app. The current implementation does not require a backend, database, authentication, or AI API.
