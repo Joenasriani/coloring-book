@@ -2,154 +2,122 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Coloring Book</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
     <style>
-      html, body {
-        height: 100%;
+      * { box-sizing: border-box; }
+
+      html,
+      body {
+        min-height: 100%;
         margin: 0;
         padding: 0;
-        overflow-x: hidden; /* Prevent horizontal scrolling */
-        background-color: #f0f4f8; /* Match app background */
-      }
-      
-      #root {
-        height: 100%;
+        overflow-x: hidden;
+        background-color: #f0f4f8;
       }
 
-      /* --- Base Layout (Mobile First <= 480px) --- */
+      body { min-width: 320px; }
+      #root { min-height: 100%; }
+
+      button,
+      [role="button"] { -webkit-tap-highlight-color: transparent; }
+
       .app-layout {
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
+        min-height: 100svh;
         width: 100%;
-        box-sizing: border-box;
       }
 
       .app-header {
         width: 100%;
-        box-sizing: border-box;
+        position: sticky;
+        top: 0;
+        z-index: 5;
       }
 
-      /* Main content wrapper */
       .content-wrapper {
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        align-items: start;
         width: 100%;
-        box-sizing: border-box;
-        padding: 10px;
-        gap: 20px;
+        max-width: 1920px;
+        margin: 0 auto;
+        padding: clamp(8px, 3vw, 28px);
+        gap: clamp(12px, 3vw, 28px);
       }
 
       .drawing-section {
         width: 100%;
+        min-width: 0;
         display: flex;
         justify-content: center;
         align-items: center;
       }
 
       .controls-sidebar {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: clamp(12px, 3vw, 20px);
         width: 100%;
+        min-width: 0;
       }
 
-      /* Ensure Drawing Area scales but preserves aspect ratio */
       .drawing-container-responsive {
-        width: 100%;
-        max-width: 100%; 
+        width: min(100%, 92svh, 760px);
+        max-width: 100%;
         height: auto;
-        aspect-ratio: 1 / 1; /* Keep square aspect ratio for the drawing */
+        aspect-ratio: 1 / 1;
       }
 
-      /* --- Intermediate (481px to 1439px) --- */
-      @media (min-width: 481px) {
+      .palette-responsive,
+      .nav-responsive { min-width: 0; }
+
+      @media (max-width: 480px) {
+        .app-header { position: static; }
+        .content-wrapper { padding: 8px; gap: 10px; }
+        .drawing-container-responsive { width: min(100%, 78svh); }
+      }
+
+      @media (min-width: 700px) {
+        .controls-sidebar {
+          grid-template-columns: minmax(0, 1.3fr) minmax(220px, 0.7fr);
+          align-items: stretch;
+        }
+      }
+
+      @media (min-width: 1100px) {
         .content-wrapper {
-          padding: 30px;
-          max-width: 800px;
-          margin: 0 auto; /* Center content */
+          grid-template-columns: minmax(460px, 1fr) minmax(320px, 420px);
+          align-items: center;
         }
 
         .controls-sidebar {
-            flex-direction: row; /* Place palette and nav side-by-side if space permits, or wrap */
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .palette-responsive {
-            flex: 1 1 300px; /* Allow growing */
-        }
-        
-        .nav-responsive {
-            flex: 1 1 200px;
-        }
-      }
-
-      /* --- Desktop (>= 1440px) --- */
-      @media (min-width: 1440px) {
-        .app-layout {
-            padding: 40px;
-            height: 100vh;
-            overflow: hidden; /* Use internal scrolling for sections if needed */
-        }
-
-        .content-wrapper {
-            max-width: 1800px;
-            margin: 0 auto;
-            flex-direction: row; /* Side-by-side layout */
-            align-items: flex-start; /* Align top */
-            gap: 60px; /* Generous whitespace */
-            height: calc(100vh - 120px); /* Adjust for header/padding */
-        }
-
-        .drawing-section {
-            flex: 2; /* Takes up 2/3 space */
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+          grid-template-columns: minmax(0, 1fr);
+          position: sticky;
+          top: 110px;
         }
 
         .drawing-container-responsive {
-            max-height: 100%;
-            width: auto;
-            max-width: 100%;
+          width: min(100%, calc(100svh - 150px), 860px);
+        }
+      }
+
+      @media (min-width: 1500px) {
+        .content-wrapper {
+          grid-template-columns: minmax(620px, 1fr) 460px;
+          gap: 48px;
         }
 
-        .controls-sidebar {
-            flex: 1; /* Takes up 1/3 space */
-            flex-direction: column;
-            justify-content: center;
-            height: 100%;
-            gap: 40px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 30px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .nav-responsive {
-            margin-top: auto; /* Push nav to bottom of sidebar logic */
+        .drawing-container-responsive {
+          width: min(100%, calc(100svh - 170px), 960px);
         }
       }
     </style>
-    <script type="importmap">
-    {
-      "imports": {
-        "react/": "https://aistudiocdn.com/react@^19.2.0/",
-        "react": "https://aistudiocdn.com/react@^19.2.0",
-        "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
-        "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
-      }
-    }
-    </script>
 </head>
 <body>
     <div id="root"></div>
-    <script type="module" src="index.tsx"></script>
+    <script type="module" src="/index.tsx"></script>
 </body>
 </html>
