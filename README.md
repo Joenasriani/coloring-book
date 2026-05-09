@@ -8,6 +8,7 @@ The app lets users:
 - Color SVG drawing regions by clicking or tapping
 - Move through five progressively richer coloring levels
 - Save the current drawing as a JPG image
+- Play optional background music from a bundled static audio file
 
 ## Tech stack
 
@@ -51,6 +52,36 @@ Run TypeScript checks:
 ```bash
 npm run typecheck
 ```
+
+## itch.io HTML upload
+
+This repo is configured for itch.io static HTML hosting.
+
+Important build details:
+
+- `vite.config.ts` uses `base: './'` so built JS, CSS, and assets load from a nested iframe or folder path.
+- The app entry in `index.html` is relative.
+- The music path in `main.tsx` is relative: `./music/Color%20Parade.mp3`.
+- The GitHub Actions workflow builds the app, verifies `dist/index.html`, verifies the bundled music folder when present, then uploads `coloring-book-itch.zip` as a workflow artifact.
+
+Manual itch.io ZIP creation:
+
+```bash
+npm install
+npm run typecheck
+npm run build
+cd dist
+zip -r ../coloring-book-itch.zip .
+```
+
+Upload `coloring-book-itch.zip` to itch.io, or upload a ZIP made from the contents of `dist`. Do not ZIP the repository root.
+
+itch.io project settings:
+
+- Kind of project: HTML
+- Upload file: `coloring-book-itch.zip`
+- Check: This file will be played in the browser
+- Recommended orientation: responsive desktop and mobile browser
 
 ## Environment variables
 
