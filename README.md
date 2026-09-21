@@ -3,7 +3,7 @@
 **Historical short name:** Coloring Book  
 **Status:** original browser coloring game  
 **Creator:** Joe Nasr  
-**Creator identity:** https://joe-nasr-signals.vercel.app/v2/
+**Creator identity:** https://joe-nasr-signals.vercel.app/
 
 Coloring Book for Kids is a touch friendly browser coloring game built around direct color selection and SVG drawing regions.
 
